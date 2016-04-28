@@ -18,7 +18,7 @@ body {
     overflow: hidden;
 }
 
-.score {
+.poeng {
     color: rgba(255, 255, 255, 0.5);
     font-size: 20px;
     font-weight: bold;
@@ -40,11 +40,11 @@ body {
     background-color: rgba(0, 0, 0, 0.15);;
 }
 
-.snake-on-cell {
+.slange-on-cell {
     background-color: #e30b5c;
 }
 
-.point {
+.skatt {
     background-color: rgb(119, 255, 51);
 }
 

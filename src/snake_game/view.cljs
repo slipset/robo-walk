@@ -4,23 +4,23 @@
             [re-frame.core :refer [subscribe dispatch]]
             [snake-game.utils :as utils]))
 
-(defn render-board
-  "Renders the game board area with the snake and the point to catch"
+(defn render-brett
+  "Renders the game brett area with the slange and the skatt to catch"
   []
-  (let [board (subscribe [:board])
-        snake (subscribe [:snake])
-        point (subscribe [:point])]
+  (let [brett (subscribe [:brett])
+        slange (subscribe [:slange])
+        skatt (subscribe [:skatt])]
     (fn []
-      (let [[width height] @board
-            snake-positions (into #{} @snake)
-            current-point @point
+      (let [[width height] @brett
+            slange-positions (into #{} @slange)
+            current-skatt @skatt
             cells (for [y (range height)]
                     (into [:tr]
                           (for [x (range width)
                                 :let [current-pos [x y]]]
                             (cond
-                              (snake-positions current-pos) [:td.snake-on-cell]
-                              (= current-pos current-point) [:td.point]
+                              (slange-positions current-pos) [:td.slange-on-cell]
+                              (= current-pos current-skatt) [:td.skatt]
                               :else [:td.cell]))))]
         (into [:table.stage {:style {:height 377
                                      :width 527}}]
@@ -29,7 +29,7 @@
 (defn game-over
   "Renders the game over overlay if the game is finished"
   []
-  (let [game-state (subscribe [:game-running?])]
+  (let [game-state (subscribe [:er-spillet-igang?])]
     (fn []
       (if @game-state
         [:div]
@@ -37,17 +37,17 @@
          [:div.play {:on-click #(dispatch [:initialize])}
           [:h1 "↺" ]]]))))
 
-(defn score
-  "Renders player's score"
+(defn poeng
+  "Renders player's poeng"
   []
-  (let [points (subscribe [:points])]
+  (let [poeng (subscribe [:poeng])]
     (fn []
-      [:div.score (str "Score: " @points)])))
+      [:div.poeng (str "Poeng: " @poeng)])))
 
 (defn game
   "The main rendering function"
   []
   [:div
    [game-over]
-   [score]
-   [render-board]])
+   [poeng]
+   [render-brett]])

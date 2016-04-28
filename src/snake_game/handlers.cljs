@@ -3,46 +3,33 @@
   (:require [re-frame.core :refer [register-handler
                                    register-sub
                                    dispatch]]
+   [snake-game.norwegian :refer [finnes-i?
+                                 endre-i]]
             [goog.events :as events]
-            [snake-game.utils :as utils]))
+            [snake-game.utils :refer [endre-retning
+                                      slange brett
+                                      er-det-en-kollisjon?
+                                      utfør-flytt
+                                      flytt-slangen
+                                      nytt-spill
+                                      oppdater-spill]]))
 
-;; Define app data. We need to define our board, points and snake. In our snake vector is in map desctibed position :position of every 'snake body' part. First elemeny in vector id head of snake. Key :direction is the direction of the next move.
 
-(def board [35 25])
-
-(def snake {:direction [1 0]
-            :body [[3 2] [2 2] [1 2] [0 2]]})
-
-(def initial-state {:board board
-                    :snake snake
-                    :point (utils/rand-free-position snake board)
-                    :points 0
-                    :game-running? true})
+(def piltast-til-retning
+  {38 [0 -1]
+   40 [0 1]
+   39 [1 0]
+   37 [-1 0]})
 
 (register-handler                  ;; setup initial state
  :initialize                       ;; usage (submit [:initialize])
  (fn
    [db _]
-   (merge db initial-state)))      ;; what it returns becomes the new @db state
+   (merge db nytt-spill)))      ;; what it returns becomes the new @db state
 
-(register-handler
- :next-state
- (fn
-   [{:keys [snake board] :as db} _]
-   (if (:game-running? db)
-     (if (utils/collisions snake board)
-       (assoc-in db [:game-running?] false)
-       (-> db
-           (update-in [:snake] utils/move-snake)
-           (as-> after-move
-               (utils/process-move after-move))))
-     db)))
 
-(register-handler
- :change-direction
- (fn [db [_ new-direction]]
-   (update-in db [:snake :direction]
-              (partial utils/change-snake-direction new-direction))))
+(register-handler :oppdater-spill oppdater-spill)
+(register-handler :endre-retning endre-retning)
 
 ;;Register global event listener for keydown event.
 ;;Processes key strokes according to `utils/key-code->move` mapping
@@ -50,37 +37,38 @@
   (events/listen js/window "keydown"
                  (fn [e]
                    (let [key-code (.-keyCode e)]
-                     (when (contains? utils/key-code->move key-code)
-                       (dispatch [:change-direction (utils/key-code->move key-code)]))))))
+                     (when (finnes-i? piltast-til-retning key-code)
+                       (dispatch [:endre-retning (piltast-til-retning
+                                                     key-code)]))))))
 
 ;; ---- Subscription Handlers ----
 
 (register-sub
- :board
+ :brett
  (fn
    [db _]                         ;; db is the app-db atom
-   (reaction (:board @db))))      ;; wrap the computation in a reaction
+   (reaction (:brett @db))))      ;; wrap the computation in a reaction
 
 (register-sub
- :snake
+ :slange
  (fn
    [db _]
-   (reaction (:body (:snake @db)))))
+   (reaction (:kropp (:slange @db)))))
 
 (register-sub
- :point
+ :skatt
  (fn
    [db _]
-   (reaction (:point @db))))
+   (reaction (:skatt @db))))
 
 (register-sub
- :points
+ :poeng
  (fn
    [db _]
-   (reaction (:points @db))))
+   (reaction (:poeng @db))))
 
 (register-sub
- :game-running?
+ :er-spillet-igang?
  (fn
    [db _]
-   (reaction (:game-running? @db))))
+   (reaction (:er-spillet-igang? @db))))

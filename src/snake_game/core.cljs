@@ -7,7 +7,7 @@
 
 ;;Dispatch next state event every 150ms
 (defonce snake-moving
-  (js/setInterval #(dispatch [:next-state]) 150))
+  (js/setInterval #(dispatch [:oppdater-spill]) 250))
 
 (defn run
   "Main app function"
