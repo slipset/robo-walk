@@ -5,13 +5,10 @@
    [snake-game.handlers :as handlers]
    [snake-game.view :as view]))
 
-;;Dispatch next state event every 150ms
 (defonce snake-moving
-  (js/setInterval #(dispatch [:oppdater-spill]) 250))
+  (js/setInterval #(dispatch [:oppdater-spill]) 750))
 
-(defn run
-  "Main app function"
-  []
+(defn run "Main app function" []
   (dispatch-sync [:initialize])
   (reagent/render [view/game]
                   (js/document.getElementById "app")))

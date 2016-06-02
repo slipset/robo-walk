@@ -1,23 +1,17 @@
 (ns snake-game.utils
-    (:require [reagent.core :as reagent :refer [atom]]
-     [snake-game.norwegian :refer [finnes-i? endre-i tall fjern
-                                   velg-en-tilfeldig
-                                   første-i neste-i
-                                   første-i-første
-                                   andre-i
-                                   kast-siste-i
-                                   putt-inni
-                                   ta-de-siste
-                                   legg-til
-                                   legg-til-i
-                                   legg-til-inni
-                                   øk-med-en
-                                   minsk-med-en
-                                   ]]))
-
-(defn vis-spill [spill]
-  (.alert js/window (pr-str spill))
-  spill)
+    (:require [snake-game.norwegian :refer [finnes-i? endre-i tall fjern
+                                            velg-en-tilfeldig
+                                            første-i neste-i
+                                            første-i-første
+                                            andre-i
+                                            kast-siste-i
+                                            putt-inni
+                                            ta-de-siste
+                                            legg-til
+                                            legg-til-i
+                                            legg-til-inni
+                                            øk-med-en
+                                            minsk-med-en]]))
 
 (defn alle-plasser-på-brettet [x y]
   (for [x-pos (tall x)
@@ -39,12 +33,12 @@
 (def slange {:retning [1 0]
              :kropp [[3 2] [2 2] [1 2] [0 2]]})
 
-(def nytt-spill  {
-                  :brett brett
-                  :slange slange
-                  :skatt (finn-en-tilfeldig-ledig-plass-på-brettet slange brett)
-                  :poeng 0
-                  :er-spillet-igang? true})
+(def nytt-spill {
+                 :brett brett
+                 :slange slange
+                 :skatt (finn-en-tilfeldig-ledig-plass-på-brettet slange brett)
+                 :poeng 0
+                 :er-spillet-igang? true})
 
 (defn er-det-en-kollisjon? [slange brett]
   (let [{:keys [kropp retning]} slange
@@ -68,7 +62,8 @@
   (let [[[første-x første-y] [andre-x andre-y]] (ta-de-siste 2 kropp)
         x (slange-halen første-x andre-x)
         y (slange-halen første-y andre-y)]
-    (endre-i slange [:kropp] #(conj % [x y]))))
+    (-> slange
+        (endre-i [:kropp] #(conj % [x y])))))
 
 (defn vi-har-truffet-skatten? [slange skatt]
   (= skatt (første-i (:kropp slange))))
@@ -84,11 +79,10 @@
 (defn avslutt [spill]
   (legg-til-inni spill [:er-spillet-igang?] false))
 
-(defn lag-ny-slange [slange nytt-hode]
-  (let [kropp (:kropp slange)]
-    (endre-i slange [:kropp]
-             #(putt-inni [] (kast-siste-i
-                             (legg-til nytt-hode kropp))))))
+(defn lag-ny-slange [{:keys [kropp] :as slange} nytt-hode]
+  (endre-i slange [:kropp]
+           #(putt-inni [] (kast-siste-i
+                           (legg-til nytt-hode kropp)))))
 
 (defn lag-nytt-hode [slange]
   (let [retning (:retning slange)
@@ -106,11 +100,11 @@
     (avslutt spill)
     (-> spill
         (flytt-slangen)
-        (utfør-flytt)
-        )))
+        (utfør-flytt))))
 
 (defn oppdater-spill [spill _]
   "Denne funksjonen blir kalt for hvert klokkelslag"
+  spill
   (if (:er-spillet-igang? spill)
     (neste-steg spill)
     spill))

@@ -3,17 +3,15 @@
   (:require [re-frame.core :refer [register-handler
                                    register-sub
                                    dispatch]]
-   [snake-game.norwegian :refer [finnes-i?
-                                 endre-i]]
-            [goog.events :as events]
-            [snake-game.utils :refer [endre-retning
-                                      slange brett
-                                      er-det-en-kollisjon?
-                                      utfør-flytt
-                                      flytt-slangen
-                                      nytt-spill
-                                      oppdater-spill]]))
-
+   [snake-game.norwegian :refer [finnes-i?]]
+   [goog.events :as events]
+   [snake-game.utils :refer [endre-retning
+                             slange brett
+                             er-det-en-kollisjon?
+                             utfør-flytt
+                             flytt-slangen
+                             nytt-spill
+                             oppdater-spill]]))
 
 (def piltast-til-retning
   {38 [0 -1]
@@ -21,12 +19,13 @@
    39 [1 0]
    37 [-1 0]})
 
-(register-handler                  ;; setup initial state
- :initialize                       ;; usage (submit [:initialize])
+(register-handler
+ :initialize
  (fn
    [db _]
-   (merge db nytt-spill)))      ;; what it returns becomes the new @db state
-
+   (if-not (:er-spillet-igang? db)
+     (merge db nytt-spill)
+     db))) 
 
 (register-handler :oppdater-spill oppdater-spill)
 (register-handler :endre-retning endre-retning)
