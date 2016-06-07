@@ -10,7 +10,7 @@
                              er-det-en-kollisjon?
                              utfør-flytt
                              flytt-slangen
-                             nytt-spill
+                             start-spill
                              oppdater-spill]]))
 
 (def piltast-til-retning
@@ -19,14 +19,7 @@
    39 [1 0]
    37 [-1 0]})
 
-(register-handler
- :initialize
- (fn
-   [db _]
-   (if-not (:er-spillet-igang? db)
-     (merge db nytt-spill)
-     db))) 
-
+(register-handler :initialize start-spill) 
 (register-handler :oppdater-spill oppdater-spill)
 (register-handler :endre-retning endre-retning)
 
@@ -37,8 +30,7 @@
                  (fn [e]
                    (let [key-code (.-keyCode e)]
                      (when (finnes-i? piltast-til-retning key-code)
-                       (dispatch [:endre-retning (piltast-til-retning
-                                                     key-code)]))))))
+                       (dispatch [:endre-retning (piltast-til-retning key-code)]))))))
 
 ;; ---- Subscription Handlers ----
 

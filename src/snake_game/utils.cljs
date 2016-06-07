@@ -11,7 +11,8 @@
                                             legg-til-i
                                             legg-til-inni
                                             øk-med-en
-                                            minsk-med-en]]))
+                                            minsk-med-en]]
+     [cljs.spec :as s]))
 
 (defn alle-plasser-på-brettet [x y]
   (for [x-pos (tall x)
@@ -21,8 +22,7 @@
 (defn alle-ledige-plasser [slangens-plasser alle-plasser]
   (fjern slangens-plasser alle-plasser))
 
-(defn finn-en-tilfeldig-ledig-plass-på-brettet
-  [slange [x y]]
+(defn finn-en-tilfeldig-ledig-plass-på-brettet [slange [x y]]
   (let [slangens-plasser (putt-inni #{} (:kropp slange))
         alle-plasser (alle-plasser-på-brettet x y)]
     (when-let [ledige-plasser (seq (alle-ledige-plasser slangens-plasser alle-plasser))]
@@ -30,26 +30,30 @@
 
 (def brett [35 25])
 
+#_(s/conform :snake-game.spec/koordinat-system brett)
+
+
 (def slange {:retning [1 0]
              :kropp [[3 2] [2 2] [1 2] [0 2]]})
 
-(def nytt-spill {
-                 :brett brett
+(def nytt-spill {:brett brett
                  :slange slange
                  :skatt (finn-en-tilfeldig-ledig-plass-på-brettet slange brett)
                  :poeng 0
                  :er-spillet-igang? true})
 
-(defn er-det-en-kollisjon? [slange brett]
-  (let [{:keys [kropp retning]} slange
-        [x y] brett
-        kant-x #{x -1}
+
+(defn er-det-en-kollisjon? [{:keys [kropp retning]} [x y]]
+  (let [kant-x #{x -1}
         kant-y #{y -1}
         neste-x (+ (første-i retning) (første-i-første kropp))
         neste-y (+ (andre-i retning) (andre-i (første-i kropp)))]
     (or (finnes-i? kant-x neste-x)
         (finnes-i? kant-y neste-y)
         (finnes-i? (putt-inni #{} (rest kropp)) [neste-x neste-y]))))
+
+
+#_(clojure.repl/doc er-det-en-kollisjon?)
 
 (defn slange-halen [koordinat-1 koordinat-2]
   (if (= koordinat-1 koordinat-2)
@@ -104,7 +108,6 @@
 
 (defn oppdater-spill [spill _]
   "Denne funksjonen blir kalt for hvert klokkelslag"
-  spill
   (if (:er-spillet-igang? spill)
     (neste-steg spill)
     spill))
@@ -120,3 +123,9 @@
 (defn endre-retning [spill [_ ny-retning]]
   (endre-i spill [:slange :retning]
            (partial bytt-retning-på-slangen ny-retning)))
+
+(defn start-spill [spill _]
+  (if-not (:er-spillet-igang? spill)
+     (merge spill nytt-spill)
+     spill))
+

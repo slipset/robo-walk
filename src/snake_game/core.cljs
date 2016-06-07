@@ -6,7 +6,7 @@
    [snake-game.view :as view]))
 
 (defonce snake-moving
-  (js/setInterval #(dispatch [:oppdater-spill]) 750))
+  (js/setInterval #(dispatch [:oppdater-spill] ) 750))
 
 (defn run "Main app function" []
   (dispatch-sync [:initialize])
@@ -14,3 +14,6 @@
                   (js/document.getElementById "app")))
 
 (run)
+(comment
+  (do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))
+)

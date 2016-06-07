@@ -1,8 +1,7 @@
 (ns snake-game.view
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [reagent.core :as reagent :refer [atom]]
-            [re-frame.core :refer [subscribe dispatch]]
-            [snake-game.utils :as utils]))
+            [re-frame.core :refer [subscribe dispatch]]))
 
 (defn render-brett
   "Renders the game brett area with the slange and the skatt to catch"
