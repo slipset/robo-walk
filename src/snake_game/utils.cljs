@@ -11,8 +11,7 @@
                                             legg-til-i
                                             legg-til-inni
                                             øk-med-en
-                                            minsk-med-en]]
-     [cljs.spec :as s]))
+                                            minsk-med-en]]))
 
 (defn alle-plasser-på-brettet [x y]
   (for [x-pos (tall x)
@@ -30,9 +29,6 @@
 
 (def brett [35 25])
 
-#_(s/conform :snake-game.spec/koordinat-system brett)
-
-
 (def slange {:retning [1 0]
              :kropp [[3 2] [2 2] [1 2] [0 2]]})
 
@@ -42,7 +38,6 @@
                  :poeng 0
                  :er-spillet-igang? true})
 
-
 (defn er-det-en-kollisjon? [{:keys [kropp retning]} [x y]]
   (let [kant-x #{x -1}
         kant-y #{y -1}
@@ -51,9 +46,6 @@
     (or (finnes-i? kant-x neste-x)
         (finnes-i? kant-y neste-y)
         (finnes-i? (putt-inni #{} (rest kropp)) [neste-x neste-y]))))
-
-
-#_(clojure.repl/doc er-det-en-kollisjon?)
 
 (defn slange-halen [koordinat-1 koordinat-2]
   (if (= koordinat-1 koordinat-2)
@@ -106,15 +98,7 @@
         (flytt-slangen)
         (utfør-flytt))))
 
-(defn oppdater-spill [spill _]
-  "Denne funksjonen blir kalt for hvert klokkelslag"
-  (if (:er-spillet-igang? spill)
-    (neste-steg spill)
-    spill))
-
-(defn bytt-retning-på-slangen
-  "Vi bytter bare retning hvis retningen er ny og riktig"
-  [[ny-x ny-y] [x y]]
+(defn bytt-retning-på-slangen [[ny-x ny-y] [x y]]
   (if (or (= x ny-x)
           (= y ny-y))
     [x y]
@@ -124,8 +108,12 @@
   (endre-i spill [:slange :retning]
            (partial bytt-retning-på-slangen ny-retning)))
 
+(defn oppdater-spill [spill _]
+  (if (:er-spillet-igang? spill)
+    (neste-steg spill)
+    spill))
+
 (defn start-spill [spill _]
   (if-not (:er-spillet-igang? spill)
      (merge spill nytt-spill)
      spill))
-

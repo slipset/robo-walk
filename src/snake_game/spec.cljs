@@ -31,27 +31,9 @@
 
 (s/def ::spill (s/keys :req-un [::brett ::slange ::skatt ::poeng ::er-spillet-igang?]))
 
-
 (s/fdef snake-game.utils/er-det-en-kollisjon?
         :args (s/cat ::slange ::spill)
         :ret #{true false})
-#_(s/conform ::slange (:slange  snake-game.utils/nytt-spill))
-
-#_(s/conform ::retning [0 1])
-
-#_(s/explain ::slange (:slange  snake-game.utils/nytt-spill))
-#_(s/describe ::slange)
-#_(clojure.repl/doc slange)
-(gen/generate (s/gen ::naturlig-tall))
-(gen/generate (s/gen ::x))
-(gen/generate (s/gen ::y))
-(gen/generate (s/gen ::punkt))
-(gen/generate (s/gen ::retning))
-(gen/generate (s/gen ::koordinat-system))
-
-#_(s/conform ::spill nytt-spill)
-#_(s/explain ::spill nytt-spill)
-
 
 (s/fdef snake-game.utils/alle-plasser-på-brettet
         :args (s/cat :brett ::brett)
@@ -121,5 +103,6 @@
         :args (s/cat :spill ::spill :event (s/tuple (s/and keyword? #(= :endre-retning %)) ::retning))
         :ret ::spill)
 
-(s/instrument #'snake-game.utils/endre-retning)
-(s/instrument #'snake-game.utils/lag-ny-slange)
+(s/fdef snake-game.utils/start-spill
+        :args (s/cat :spill ::spill :foo keyword?)
+        :ret ::spill)
