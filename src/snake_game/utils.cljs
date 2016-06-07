@@ -73,12 +73,11 @@
     spill))
 
 (defn avslutt [spill]
-  (legg-til-inni spill [:er-spillet-igang?] false))
+  (legg-til-i spill :er-spillet-igang? false))
 
 (defn lag-ny-slange [{:keys [kropp] :as slange} nytt-hode]
-  (endre-i slange [:kropp]
-           #(putt-inni [] (kast-siste-i
-                           (legg-til nytt-hode kropp)))))
+  (legg-til-i slange :kropp (putt-inni [] (kast-siste-i
+                                           (legg-til nytt-hode kropp)))))
 
 (defn lag-nytt-hode [slange]
   (let [retning (:retning slange)
