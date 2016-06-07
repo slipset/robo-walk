@@ -1,5 +1,7 @@
 (ns snake-game.spec
-    (:require  [cljs.spec :as s]
+    (:require
+     [cljs.spec :as s]
+     [snake-game.utils :as utils]
      [clojure.test.check.generators :as gen]))
 
 (defn only-one [[n1 n2 & xs]]
@@ -31,74 +33,74 @@
 
 (s/def ::spill (s/keys :req-un [::brett ::slange ::skatt ::poeng ::er-spillet-igang?]))
 
-(s/fdef snake-game.utils/alle-plasser-på-brettet
+(s/fdef utils/alle-plasser-på-brettet
         :args (s/cat :brett ::brett)
         :ret (s/coll-of ::punkt []))
 
-(s/fdef snake-game.utils/alle-ledige-plasser
+(s/fdef utils/alle-ledige-plasser
         :args (s/cat :slangens-plasser (s/coll-of ::punkt []) :ledige-plassser (s/coll-of ::punkt []))
         :ret (s/coll-of ::punkt []))
 
-(s/fdef snake-game.utils/finn-en-tilfeldig-ledig-plass-på-brettet
+(s/fdef utils/finn-en-tilfeldig-ledig-plass-på-brettet
         :args (s/cat :slange ::slange :brett ::brett)
         :ret ::punkt)
 
-(s/fdef snake-game.utils/er-det-en-kollisjon?
+(s/fdef utils/er-det-en-kollisjon?
         :args (s/cat :slange ::slange :brett ::brett)
         :ret #{true false})
 
-(s/fdef snake-game.utils/slange-halen
+(s/fdef utils/slange-halen
         :args (s/cat :punkt ::punkt)
         :ret integer?)
 
-(s/fdef snake-game.utils/gjør-slangen-større
+(s/fdef utils/gjør-slangen-større
         :args (s/cat :slange ::slange)
         :fn #(= (-> % :args :slange :kropp count inc) (-> % :ret :slange :kropp count))
         :ret ::slange)
 
-(s/fdef snake-game.utils/har-vi-truffet-skatten?
+(s/fdef utils/har-vi-truffet-skatten?
         :args (s/cat :slange ::slange :skatt ::punkt)
         :ret #{true false})
 
-(s/fdef snake-game.utils/utfør-flytt
+(s/fdef utils/utfør-flytt
         :args (s/cat :spill ::spill)
         :ret ::spill)
 
-(s/fdef snake-game.utils/avslutt
+(s/fdef utils/avslutt
         :args (s/cat :spill ::spill)
         :ret ::spill)
 
-(s/fdef snake-game.utils/lag-ny-slange
+(s/fdef utils/lag-ny-slange
         :args (s/cat :slange ::slange :nytt-hode ::punkt)
         :fn #(and (= (-> % :args :slange :kropp count) (-> % :ret :kropp count))
                   (= (-> % :args :slange :kropp first) (-> % :ret :kropp second))
                   (= (-> % :args :slange :retning) (-> % :ret :retning)))
         :ret ::slange)
 
-(s/fdef snake-game.utils/lag-nytt-hode
+(s/fdef utils/lag-nytt-hode
         :args (s/cat :slange ::slange)
         :ret ::punkt)
 
-(s/fdef snake-game.utils/flytt-slangen
+(s/fdef utils/flytt-slangen
         :args (s/cat :spill ::spill)
         :ret ::spill)
 
-(s/fdef snake-game.utils/neste-steg
+(s/fdef utils/neste-steg
         :args (s/cat :spill ::spill)
         :ret ::spill)
 
-(s/fdef snake-game.utils/oppdater-spill
+(s/fdef utils/oppdater-spill
         :args (s/cat :spill ::spill :foo keyword?)
         :ret ::spill)
 
-(s/fdef snake-game.utils/bytt-retning-på-slangen
+(s/fdef utils/bytt-retning-på-slangen
         :args (s/cat :ny-retning ::retning :gammel-retning ::retning)
         :ret ::retning)
 
-(s/fdef snake-game.utils/endre-retning
+(s/fdef utils/endre-retning
         :args (s/cat :spill ::spill :event (s/tuple (s/and keyword? #(= :endre-retning %)) ::retning))
         :ret ::spill)
 
-(s/fdef snake-game.utils/start-spill
+(s/fdef utils/start-spill
         :args (s/cat :spill ::spill :foo keyword?)
         :ret ::spill)
