@@ -9,7 +9,7 @@
       [false])
     []))
 
-(defn kropp? [{:keys [kropp]}]
+(defn kropp? [kropp]
   (let [xs (map first kropp)
         ys (map second kropp)]
     (and (every? identity (only-one xs))
@@ -22,18 +22,14 @@
 (s/def ::punkt (s/spec (s/tuple  ::x  ::y)))
 (s/def ::brett ::koordinat-system)
 (s/def ::retning (s/and (s/tuple #{-1 0 1} #{-1 0 1}) (fn [[x y]] (not= x y))))
-(s/def ::kropp (s/coll-of ::punkt []))
+(s/def ::kropp (s/and (s/coll-of ::punkt []) kropp?))
 (s/def ::skatt  ::punkt)
 (s/def ::poeng (s/and integer? #(< -1 %)))
 (s/def ::er-spillet-igang? #{true false})
 
-(s/def ::slange (s/and (s/keys :req-un [::retning ::kropp]) kropp?))
+(s/def ::slange (s/keys :req-un [::retning ::kropp]))
 
 (s/def ::spill (s/keys :req-un [::brett ::slange ::skatt ::poeng ::er-spillet-igang?]))
-
-(s/fdef snake-game.utils/er-det-en-kollisjon?
-        :args (s/cat ::slange ::spill)
-        :ret #{true false})
 
 (s/fdef snake-game.utils/alle-plasser-på-brettet
         :args (s/cat :brett ::brett)
@@ -57,7 +53,7 @@
 
 (s/fdef snake-game.utils/gjør-slangen-større
         :args (s/cat :slange ::slange)
-        :fn #(= (inc (-> % :args :slange :kropp count)) (-> % :ret :slange :kropp count))
+        :fn #(= (-> % :args :slange :kropp count inc) (-> % :ret :slange :kropp count))
         :ret ::slange)
 
 (s/fdef snake-game.utils/har-vi-truffet-skatten?
