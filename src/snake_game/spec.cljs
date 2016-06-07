@@ -17,21 +17,19 @@
     (and (every? identity (only-one xs))
          (every? identity (only-one ys)))))
 
-(s/def ::naturlig-tall (s/and integer? #(< -1 %)))
-(s/def ::x (s/and ::naturlig-tall #(< -1 % 35)))
-(s/def ::y (s/and ::naturlig-tall #(< 0 % 25)))
-(s/def ::koordinat-system  (s/tuple ::naturlig-tall ::naturlig-tall))
-(s/def ::punkt (s/spec (s/tuple  ::x  ::y)))
-(s/def ::brett ::koordinat-system)
-(s/def ::retning (s/and (s/tuple #{-1 0 1} #{-1 0 1}) (fn [[x y]] (not= x y))))
-(s/def ::kropp (s/and (s/coll-of ::punkt []) kropp?))
-(s/def ::skatt  ::punkt)
-(s/def ::poeng (s/and integer? #(< -1 %)))
+(s/def ::naturlig-tall     (s/and integer? #(< -1 %)))
+(s/def ::x                 (s/and ::naturlig-tall #(< % 36)))
+(s/def ::y                 (s/and ::naturlig-tall #(< % 26)))
+(s/def ::koordinat-system  (s/tuple ::x ::y))
+(s/def ::punkt             (s/tuple  ::x ::y))
+(s/def ::brett             ::koordinat-system)
+(s/def ::retning           (s/and (s/tuple #{-1 0 1} #{-1 0 1}) (fn [[x y]] (not= x y))))
+(s/def ::kropp             (s/and (s/coll-of ::punkt []) kropp?))
+(s/def ::skatt             ::punkt)
+(s/def ::poeng             (s/and integer? #(< -1 %)))
 (s/def ::er-spillet-igang? #{true false})
-
-(s/def ::slange (s/keys :req-un [::retning ::kropp]))
-
-(s/def ::spill (s/keys :req-un [::brett ::slange ::skatt ::poeng ::er-spillet-igang?]))
+(s/def ::slange            (s/keys :req-un [::retning ::kropp]))
+(s/def ::spill             (s/keys :req-un [::brett ::slange ::skatt ::poeng ::er-spillet-igang?]))
 
 (s/fdef utils/alle-plasser-på-brettet
         :args (s/cat :brett ::brett)
