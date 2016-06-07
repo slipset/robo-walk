@@ -21,7 +21,7 @@
 (s/def ::x                 (s/and ::naturlig-tall #(< % 36)))
 (s/def ::y                 (s/and ::naturlig-tall #(< % 26)))
 (s/def ::koordinat-system  (s/tuple ::x ::y))
-(s/def ::punkt             (s/tuple  ::x ::y))
+(s/def ::punkt             (s/tuple ::x ::y))
 (s/def ::brett             ::koordinat-system)
 (s/def ::retning           (s/and (s/tuple #{-1 0 1} #{-1 0 1}) (fn [[x y]] (not= x y))))
 (s/def ::kropp             (s/and (s/coll-of ::punkt []) kropp?))
