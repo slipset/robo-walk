@@ -13,6 +13,7 @@
                                             øk-med-en
                                             minsk-med-en]]))
 
+
 (defn alle-plasser-på-brettet [x y]
   (for [x-pos (tall x)
         y-pos (tall y)]
@@ -21,30 +22,40 @@
 (defn alle-ledige-plasser [slangens-plasser alle-plasser]
   (fjern slangens-plasser alle-plasser))
 
-(defn finn-en-tilfeldig-ledig-plass-på-brettet [slange [x y]]
+(defn finn-tilfeldige-ledige-plasser-på-brettet [antall slange [x y] {}]
   (let [slangens-plasser (putt-inni #{} (:kropp slange))
+        hindre (putt-inni #{} (:hindre {}))
         alle-plasser (alle-plasser-på-brettet x y)]
     (when-let [ledige-plasser (seq (alle-ledige-plasser slangens-plasser alle-plasser))]
       (velg-en-tilfeldig ledige-plasser))))
 
-(def brett [35 25])
+(def brett [12 8])
 
 (def slange {:retning [1 0]
-             :kropp [[3 2] [2 2] [1 2] [0 2]]})
+             :kropp [[0 6]]})
 
 (def nytt-spill {:brett brett
                  :slange slange
-                 :skatt (finn-en-tilfeldig-ledig-plass-på-brettet slange brett)
+                 :hindre #{[1 0] [2 0] [10 0] [11 0]
+                           [6 1] [7 1]
+                           [6 2]
+                           [6 3] [11 3]
+                           [3 5]
+                           [4 6] [5 6]
+                           [0 7] [4 7] [6 7]} #_(finn-tilfeldige-ledige-plasser-på-brettet 5 slange brett)
                  :poeng 0
                  :er-spillet-igang? true})
 
-(defn er-det-en-kollisjon? [{:keys [kropp retning]} [x y]]
-  (let [kant-x #{x -1}
+(defn er-det-en-kollisjon? [{:keys [brett hindre slange]} ]
+  (let [[x y] brett
+        {:keys [retning kropp]} slange
+        kant-x #{x -1}
         kant-y #{y -1}
         neste-x (+ (første-i retning) (første-i-første kropp))
         neste-y (+ (andre-i retning) (andre-i (første-i kropp)))]
     (or (finnes-i? kant-x neste-x)
         (finnes-i? kant-y neste-y)
+        (hindre [neste-x neste-y])
         (finnes-i? (putt-inni #{} (rest kropp)) [neste-x neste-y]))))
 
 (defn slange-halen [koordinat-1 koordinat-2]
@@ -60,17 +71,6 @@
         y (slange-halen første-y andre-y)]
     (-> slange
         (endre-i [:kropp] #(conj % [x y])))))
-
-(defn vi-har-truffet-skatten? [slange skatt]
-  (= skatt (første-i (:kropp slange))))
-
-(defn utfør-flytt [{:keys [slange skatt brett] :as spill}]
-  (if (vi-har-truffet-skatten? slange skatt)
-    (-> spill
-        (endre-i [:slange] gjør-slangen-større)
-        (endre-i [:poeng]  øk-med-en)
-        (legg-til-i :skatt (finn-en-tilfeldig-ledig-plass-på-brettet slange brett)))
-    spill))
 
 (defn avslutt [spill]
   (legg-til-i spill :er-spillet-igang? false))
@@ -90,12 +90,6 @@
         ny-slange (lag-ny-slange slange nytt-hode)]
     (legg-til-i spill :slange ny-slange)))
 
-(defn neste-steg [{:keys [slange brett] :as spill}]
-  (if (er-det-en-kollisjon? slange brett)
-    (avslutt spill)
-    (-> spill
-        (flytt-slangen)
-        (utfør-flytt))))
 
 (defn bytt-retning-på-slangen [[ny-x ny-y] [x y]]
   (if (or (= x ny-x)
@@ -106,6 +100,26 @@
 (defn endre-retning [spill [_ ny-retning]]
   (endre-i spill [:slange :retning]
            (partial bytt-retning-på-slangen ny-retning)))
+
+(defn til-høyre [retning]
+  (condp = retning
+    [1 0]  [0 1]
+    [0 1]  [-1 0]
+    [-1 0] [0 -1]
+    [0 -1]  [1 0]))
+
+(defn kanskje-endre-retning [{:keys [brett slange] :as spill}]
+  (if (er-det-en-kollisjon? spill)
+    (endre-retning spill [nil (til-høyre (:retning slange))])
+    spill))
+
+(defn neste-steg [{:keys [slange brett] :as spill}]
+  (if (er-det-en-kollisjon? spill)
+    (avslutt spill)
+    (-> spill
+        (flytt-slangen)
+        (kanskje-endre-retning))))
+
 
 (defn oppdater-spill [spill _]
   (if (:er-spillet-igang? spill)

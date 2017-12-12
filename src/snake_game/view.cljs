@@ -8,18 +8,18 @@
   []
   (let [brett (subscribe [:brett])
         slange (subscribe [:slange])
-        skatt (subscribe [:skatt])]
+        hindre (subscribe [:hindre])]
     (fn []
       (let [[width height] @brett
             slange-positions (into #{} @slange)
-            current-skatt @skatt
+            hindre @hindre
             cells (for [y (range height)]
                     (into [:tr]
                           (for [x (range width)
                                 :let [current-pos [x y]]]
                             (cond
                               (slange-positions current-pos) [:td.slange-on-cell]
-                              (= current-pos current-skatt) [:td.skatt]
+                              (hindre current-pos) [:td.skatt]
                               :else [:td.cell]))))]
         (into [:table.stage {:style {:height 377
                                      :width 527}}]
@@ -48,5 +48,5 @@
   []
   [:div
    [game-over]
-   [poeng]
+#_   [poeng]
    [render-brett]])

@@ -8,7 +8,6 @@
    [snake-game.utils :refer [endre-retning
                              slange brett
                              er-det-en-kollisjon?
-                             utfør-flytt
                              flytt-slangen
                              start-spill
                              oppdater-spill]]))
@@ -21,16 +20,10 @@
 
 (register-handler :initialize start-spill) 
 (register-handler :oppdater-spill oppdater-spill)
-(register-handler :endre-retning endre-retning)
 
 ;;Register global event listener for keydown event.
 ;;Processes key strokes according to `utils/key-code->move` mapping
-(defonce key-handler
-  (events/listen js/window "keydown"
-                 (fn [e]
-                   (let [key-code (.-keyCode e)]
-                     (when (finnes-i? piltast-til-retning key-code)
-                       (dispatch [:endre-retning (piltast-til-retning key-code)]))))))
+
 
 ;; ---- Subscription Handlers ----
 
@@ -41,16 +34,15 @@
    (reaction (:brett @db))))      ;; wrap the computation in a reaction
 
 (register-sub
+ :hindre
+ (fn [db _]
+   (reaction (:hindre @db))))
+
+(register-sub
  :slange
  (fn
    [db _]
    (reaction (:kropp (:slange @db)))))
-
-(register-sub
- :skatt
- (fn
-   [db _]
-   (reaction (:skatt @db))))
 
 (register-sub
  :poeng
